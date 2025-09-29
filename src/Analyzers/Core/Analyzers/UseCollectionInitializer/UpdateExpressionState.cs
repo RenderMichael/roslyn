@@ -338,7 +338,7 @@ internal readonly struct UpdateExpressionState<
             return TryAnalyzeExpressionStatement(statement);
 
         if (SyntaxFacts.IsForEachStatement(statement))
-            return TryAnalyzeForeachStatement(this.SemanticModel, statement);
+            return TryAnalyzeForeachStatement(statement);
 
         if (SyntaxFacts.IsIfStatement(statement))
             return TryAnalyzeIfStatement(statement);
@@ -359,12 +359,9 @@ internal readonly struct UpdateExpressionState<
             return null;
         }
 
-        CollectionMatch<SyntaxNode>? TryAnalyzeForeachStatement(
-            SemanticModel semanticModel, TStatementSyntax foreachStatement)
+        CollectionMatch<SyntaxNode>? TryAnalyzeForeachStatement(TStatementSyntax foreachStatement)
         {
-            syntaxHelper.GetPartsOfForeachStatement(
-                semanticModel, foreachStatement,
-                out var awaitKeyword, out var identifier, out _, out var foreachStatements, out var needsCast);
+            syntaxHelper.GetPartsOfForeachStatement(foreachStatement, out var awaitKeyword, out var identifier, out _, out var foreachStatements);
             if (awaitKeyword != default)
                 return null;
 
@@ -386,7 +383,7 @@ internal readonly struct UpdateExpressionState<
                 @this.ValuePatternMatches(instance))
             {
                 // `foreach` will become `..expr` when we make it into a collection expression.
-                return new(foreachStatement, UseSpread: true, needsCast);
+                return new(foreachStatement, UseSpread: true);
             }
 
             return null;
